@@ -7,18 +7,18 @@ of image (exif meta-data or file creation date).
 Installation
 ------------------------------------------------------------------------
 
-~~
+~~~shell
 > pip install exifsort
-~~
+~~~
 
 Usage
 ------------------------------------------------------------------------
 
 ### Move command
 
-~~
-exifsort mv [OPTIONS] SOURCEDIR TARGETDIR
-~~
+~~~shell
+> exifsort mv [OPTIONS] SOURCEDIR TARGETDIR
+~~~
 
 Moves the images inside SOURCEDIR into sorted folders under TARGETDIR.
 Target folders will be sorted based on the date the image was created
@@ -44,9 +44,9 @@ available).
 
 ### Copy command
 
-~~
-exifsort cp [OPTIONS] SOURCEDIR TARGETDIR
-~~
+~~~shell
+> exifsort cp [OPTIONS] SOURCEDIR TARGETDIR
+~~~
 
 same options as move, but copies all source files to destination instead
 of moving the files.
