@@ -56,23 +56,24 @@ def cli():
 @click.argument('SOURCEDIR')
 @click.argument('TARGETDIR')
 @click.option(
-    '--recurse', '-r', default=None,
+    '--recurse', '-r', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--overwrite', '-o', default=None,
+    '--overwrite', '-o', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--hierarch', '-H', default=None,
+    '--hierarch', '-H', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--fmt', '-f', default=None,
+    '--fmt', '-f', default="YYYY-MM-DD", type=str,
+    metavar='<fmt>',
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--verbose', '-v', default=None,
+    '--verbose', '-v', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 def mv(**kwargs):
@@ -83,23 +84,24 @@ def mv(**kwargs):
 @click.argument('SOURCEDIR')
 @click.argument('TARGETDIR')
 @click.option(
-    '--recurse', '-r', default=None,
+    '--recurse', '-r', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--overwrite', '-o', default=None,
+    '--overwrite', '-o', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--hierarch', '-', default=None,
+    '--hierarch', '-H', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--fmt', '-f', default=None,
+    '--fmt', '-f', default="YYYY-MM-DD", type=str,
+    metavar='<fmt>',
     help='TODO: PUT HELP HERE'
     )
 @click.option(
-    '--verbose', '-v', default=None,
+    '--verbose', '-v', is_flag=True,
     help='TODO: PUT HELP HERE'
     )
 def cp(**kwargs):
