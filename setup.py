@@ -52,21 +52,27 @@ setup(
     license='BSD 2-Clause',
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-        'License License :: Other/Proprietary License ',
+        'Environment :: Console',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows :: Windows 10',
+        'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Utilities',
     ],
 
-    keywords='sort image exif',
+    keywords='sort image exif utility',
 
     packages=find_packages(
         exclude=['dist', 'build', 'contrib', 'docs', 'tests']
         ),
 
     # add your package requirements
-    install_requires=['click>=7,<8', 'pillow>=6,<7'],
+    install_requires=['click>=7,<8', 'pillow>=6,<7', 'colorama>=0.4,<0.5'],
 
     entry_points={
         'console_scripts': [

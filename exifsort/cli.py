@@ -53,59 +53,59 @@ def cli():
 
 # mysort command
 @cli.command()
-@click.argument('SOURCEDIR')
-@click.argument('TARGETDIR')
+@click.argument('SRCDIR')
+@click.argument('TGTDIR')
 @click.option(
     '--recurse', '-r', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Search for images in SRCDIR recursively'
     )
 @click.option(
     '--overwrite', '-o', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Overwrite files in TGTDIR'
     )
 @click.option(
     '--hierarch', '-H', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
     )
 @click.option(
     '--fmt', '-f', default="YYYY-MM-DD", type=str,
     metavar='<fmt>',
-    help='TODO: PUT HELP HERE'
+    help='Format target directory name using date format string give in <fmt>'
     )
 @click.option(
-    '--verbose', '-v', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    '--verbose', '-V', is_flag=True,
+    help='output in verbose mode'
     )
 def mv(**kwargs):
-    """Sort and Move images to target."""
+    """Sort and Move images from SRCDIR to TGTDIR."""
     sort.mv(kwargs)
 
 @cli.command()
-@click.argument('SOURCEDIR')
-@click.argument('TARGETDIR')
+@click.argument('SRCDIR')
+@click.argument('TGTDIR')
 @click.option(
     '--recurse', '-r', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Search for images in SRCDIR recursively'
     )
 @click.option(
     '--overwrite', '-o', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Overwrite files in TGTDIR'
     )
 @click.option(
     '--hierarch', '-H', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
     )
 @click.option(
     '--fmt', '-f', default="YYYY-MM-DD", type=str,
     metavar='<fmt>',
-    help='TODO: PUT HELP HERE'
+    help='Format target directory name using date format string give in <fmt>'
     )
 @click.option(
-    '--verbose', '-v', is_flag=True,
-    help='TODO: PUT HELP HERE'
+    '--verbose', '-V', is_flag=True,
+    help='output in verbose mode'
     )
 def cp(**kwargs):
-    """Sort and Move images to target."""
+    """Sort and Copy images from SRCDIR to TGTDIR."""
     sort.cp(kwargs)
 
 # Entry point
