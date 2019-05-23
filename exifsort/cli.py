@@ -44,6 +44,7 @@ from exifsort.sort import sort
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+defaultFmt = r'%Y-%m-%d'
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version=__version__)
@@ -68,9 +69,9 @@ def cli():
     help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
     )
 @click.option(
-    '--fmt', '-f', default="YYYY-MM-DD", type=str,
+    '--fmt', '-f', default=defaultFmt, type=str,
     metavar='<fmt>',
-    help='Format target directory name using date format string give in <fmt>'
+    help='Format target directory name using date format string give in <fmt>.  Use Python strftime directives.'
     )
 @click.option(
     '--verbose', '-V', is_flag=True,
@@ -96,9 +97,9 @@ def mv(**kwargs):
     help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
     )
 @click.option(
-    '--fmt', '-f', default="YYYY-MM-DD", type=str,
+    '--fmt', '-f', default=defaultFmt, type=str,
     metavar='<fmt>',
-    help='Format target directory name using date format string give in <fmt>'
+    help='Format target directory name using date format string give in <fmt>.  Use Python strftime directives.'
     )
 @click.option(
     '--verbose', '-V', is_flag=True,
