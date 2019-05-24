@@ -31,6 +31,7 @@
 import os
 import platform
 import time
+import re
 from datetime import date
 from enum import IntEnum
 
@@ -104,7 +105,6 @@ def creation_date(path_to_file):
 
 def getDateOfImage(fpath, verbose=False):
     rt = None
-
     # First try to get date from exif
     try:
         img = Image.open(fpath)
@@ -124,12 +124,10 @@ def getDateOfImage(fpath, verbose=False):
         pout("{filename} not an image\n".format(filename=fpath),
             verbose,
             Level.DEBUG)
-
     # If no exif in image, get data from os
     if rt == None:
         rt = creation_date(fpath)
         pass
-
     return rt
 
 def getImages(flist=[], verbose=False):
@@ -137,7 +135,7 @@ def getImages(flist=[], verbose=False):
         dateinfo = getDateOfImage(fpath, verbose)
         # if datetimeinfor is "NON", get the date from os
         # TODO: Should yield image path and target directory path
-        yield ({fpath, dateinfo})
+        yield ({"path": fpath, "date" : dateinfo})
 
 def sort(kwargs, func):
     """Sort images to sorted directories using func
@@ -160,8 +158,9 @@ def sort(kwargs, func):
     bVerb = kwargs['verbose']
 
     # Step 1:
-    # search for images in kwargs["srcdir"] and obtain date of image
-    # and create destination path to move/copy to
+    # search for images in kwargs["srcdir"]
+    # TODO: prune file list of non-image files based on file extensions
+    # jpg, jpeg, png, gif, tiff, tif, bmp, webp, img
     flist = []
     if bRec:
         for subdir, dirs, files in os.walk(sSrc):
@@ -171,13 +170,23 @@ def sort(kwargs, func):
         for fpath in os.listdir(sSrc):
             flist.append(fpath)
     pout(flist, bVerb, Level.DEBUG)
+    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img')
+    flist = [ file for file in flist if file.lower().endswith(extensions) ]
 
     # Step 2:
     # Move/Copy files to kwargs["dstdir"]/<formatted date dir>
-    with click.progressbar(getImages(flist, bVerb), label="Processing Images") as images:
-        for image in images:
-            pout(image, bVerb, Leve.DEBUG)
-            // func(kwargs["srcdir"], kwargs["tgtdir"], kwargs)
+    with click.progressbar(label="Processing Images", length=len(flist)) as bar:
+        i = 0
+        num = len(flist)
+        for image in getImages(flist, bVerb):
+            pout(image, bVerb, Level.DEBUG)
+            bar.update(i)
+            i += 1
+            pout("{current}/{total} : {file}".format(current=i, total=num, file=image["path"]),
+                bVerb, Level.INFO)
+            # use func(src, dst, verbose) to move/copy image to appropriate path
+
+    return
 
 def cp(kwargs):
     """Copy images to sorted directories."""
