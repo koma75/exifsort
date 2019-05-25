@@ -28,19 +28,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import absolute_import, \
-    division,\
-    print_function
+from __future__ import absolute_import, division, print_function
 
 # Import the main click library
 import click
-
-# Import the version information
-from exifsort.version import __version__
-
 # Import the sub-command implementations
 from exifsort.sort import sort
-
+# Import the version information
+from exifsort.version import __version__
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -69,6 +64,10 @@ def cli():
     help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
     )
 @click.option(
+    '--dry-run', '-d', is_flag=True,
+    help='Dry run the command without moving'
+    )
+@click.option(
     '--fmt', '-f', default=defaultFmt, type=str,
     metavar='<fmt>',
     help='Format target directory name using date format string give in <fmt>.  Use Python strftime directives.'
@@ -95,6 +94,10 @@ def mv(**kwargs):
 @click.option(
     '--hierarch', '-H', is_flag=True,
     help='Create a hierarchical directory for Year, Month and Date in TGTDIR'
+    )
+@click.option(
+    '--dry-run', '-d', is_flag=True,
+    help='Dry run the command without copying'
     )
 @click.option(
     '--fmt', '-f', default=defaultFmt, type=str,

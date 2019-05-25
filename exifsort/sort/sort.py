@@ -30,8 +30,9 @@
 
 import os
 import platform
-import time
 import re
+import shutil
+import time
 from datetime import date
 from enum import IntEnum
 
@@ -48,12 +49,13 @@ class Level(IntEnum):
     ERROR = 40
     CRITICAL = 50
 
-def pout(msg=None, Verbose=False, level=Level.INFO):
+def pout(msg=None, Verbose=False, level=Level.INFO, newline=True):
     """stdout support method
     :param msg: message to print
     :param Verbose: Set True to print DEBUG message
     :param level: Set message level for coloring
     """
+    error=False
     if level in {Level.NOTSET, Level.DEBUG}:
         # blah
         if not Verbose:
@@ -63,28 +65,69 @@ def pout(msg=None, Verbose=False, level=Level.INFO):
         fg = 'green'
     elif level == Level.WARNING:
         fg = 'yellow'
+        error=True
     elif level in {Level.ERROR, Level.CRITICAL}:
         fg = 'red'
+        error=True
     else:
         pass
-    click.echo(click.style(str(msg), fg=fg))
+    click.echo(click.style(str(msg), fg=fg), nl=newline, err=error)
 
-def copyImage(src, dst, verbose=False):
+def copyImage(src, dst, dryrun=False, overwrite=False, verbose=False):
     """copy image from src to dst
     :param src: path to image to copy
     :param dst: directory path to copy src to
+    :param dryrun: dryrun if set to True
     :param verbose: set to true to output debug messages
     """
-    pass
+    pout("{img} => {toDir}".format(img=os.path.abspath(src), toDir=os.path.abspath(dst)), verbose, Level.INFO)
+    if not dryrun:
+        if os.path.exists(dst):
+            if overwrite:
+                # delete file and copy
+                try:
+                    os.remove(dst)
+                except:
+                    pout("could not overwrite {file}".format(file=dst))
+                    return
+            else:
+                pout("{file} already exists.".format(file=dst), verbose, Level.WARNING)
+                return
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
+            shutil.copy2(os.path.abspath(src), os.path.abspath(dst))
+        except:
+            pout("could not copy to {file}".format(file=os.path.abspath(dst)), verbose, Level.WARNING)
+    else:
+        pout("DRY RUN... nothing is copied", verbose, Level.INFO)
 
-def moveImage(src, dst, verbose=False):
+def moveImage(src, dst, dryrun=False, overwrite=False, verbose=False):
     """move image from src to dst
     :param src: path to image to move
     :param dst: directory path to move src to
+    :param dryrun: dryrun if set to True
     :param verbose: set to true to output debug messages
     """
-    pout("moving image", verbose, Level.DEBUG)
-    pass
+    pout("{img} => {toDir}".format(img=os.path.abspath(src), toDir=os.path.abspath(dst)), verbose, Level.INFO)
+    if not dryrun:
+        if os.path.exists(dst):
+            if overwrite:
+                # delete file and copy
+                try:
+                    os.remove(dst)
+                except:
+                    pout("could not overwrite {file}".format(file=dst))
+                    return
+            else:
+                pout("{file} already exists.".format(file=dst), verbose, Level.WARNING)
+                return
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
+            shutil.move(os.path.abspath(src), os.path.abspath(dst))
+        except:
+            pout("could not move to {dst}".format(dst=os.path.abspath(dst)), verbose, Level.WARNING)
+    else:
+        pout("DRY RUN... nothing is moved", verbose, Level.INFO)
 
 def creation_date(path_to_file):
     """
@@ -117,25 +160,42 @@ def getDateOfImage(fpath, verbose=False):
                     rt = date(int(dtArr[0]), int(dtArr[1]), int(dtArr[2]))
             img.close()
         except AttributeError:
-            pout("Exif read error: {filename}\n".format(filename=fpath),
+            pout("Exif not found: {filename}".format(filename=fpath),
                 verbose,
                 Level.DEBUG)
+            # use file creation date instead if exif is not found
+            rt = creation_date(fpath)
     except:
-        pout("{filename} not an image\n".format(filename=fpath),
+        pout("{filename} not an image".format(filename=fpath),
             verbose,
             Level.DEBUG)
-    # If no exif in image, get data from os
-    if rt == None:
-        rt = creation_date(fpath)
-        pass
     return rt
 
 def getImages(flist=[], verbose=False):
     for fpath in flist:
         dateinfo = getDateOfImage(fpath, verbose)
         # if datetimeinfor is "NON", get the date from os
-        # TODO: Should yield image path and target directory path
         yield ({"path": fpath, "date" : dateinfo})
+
+def getTgtDir(basePath, fmt, filedate, filename, hierarch=False, verbose=False, makedir=False):
+    """generate the path to move file to based on base path and format.
+    If the path does not exist, the directories will be generated as well.
+    :param basePath: path where directories are made
+    :param fmt: formatting for the directory path
+    :param filedate: datetime.date object.  path will be based on this date
+    :param hierarch: ignore fmt and create a new hierarchical path %Y/%m/%d
+    :param verbose: verbose mode if set to True
+    :param makedir: create the target path if True
+    returns a string
+    """
+    rt = None
+    if not hierarch:
+        rt = os.path.join(basePath, filedate.strftime(fmt))
+    else:
+        rt = os.path.join(basePath, filedate.strftime(r"%Y"), filedate.strftime(r"%m"), filedate.strftime(r"%d"))
+    if makedir:
+        os.makedirs(rt, exist_ok=True)
+    return os.path.join(rt, filename)
 
 def sort(kwargs, func):
     """Sort images to sorted directories using func
@@ -156,48 +216,56 @@ def sort(kwargs, func):
     sFmt = kwargs['fmt']
     # 'verbose': verbose mode flag (bool)
     bVerb = kwargs['verbose']
-
+    # 'dry-run':
+    bDry = kwargs['dry_run']
     # Step 1:
     # search for images in kwargs["srcdir"]
     # TODO: prune file list of non-image files based on file extensions
     # jpg, jpeg, png, gif, tiff, tif, bmp, webp, img
     flist = []
     if bRec:
-        for subdir, dirs, files in os.walk(sSrc):
+        for subdir, _, files in os.walk(sSrc):
             for fpath in files:
                 flist.append(subdir + os.sep + fpath)
     else:
         for fpath in os.listdir(sSrc):
             flist.append(fpath)
     pout(flist, bVerb, Level.DEBUG)
-    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img')
+    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4')
     flist = [ file for file in flist if file.lower().endswith(extensions) ]
-
     # Step 2:
     # Move/Copy files to kwargs["dstdir"]/<formatted date dir>
-    with click.progressbar(label="Processing Images", length=len(flist)) as bar:
-        i = 0
-        num = len(flist)
-        for image in getImages(flist, bVerb):
-            pout(image, bVerb, Level.DEBUG)
-            bar.update(i)
-            i += 1
-            pout("{current}/{total} : {file}".format(current=i, total=num, file=image["path"]),
-                bVerb, Level.INFO)
-            # use func(src, dst, verbose) to move/copy image to appropriate path
-
+    i = 0
+    num = len(flist)
+    for image in getImages(flist, bVerb):
+        pout(image, bVerb, Level.DEBUG)
+        i += 1
+        pout("{current}/{total} : ".format(
+            current=i,
+            total=num),
+            bVerb, Level.INFO, newline=False)
+        func(image["path"],
+            getTgtDir(
+                sTgt,
+                sFmt,
+                image["date"],
+                os.path.basename(image["path"]),
+                bHier,
+                bVerb),
+            bDry,
+            bOverwrite,
+            bVerb)
+        # use func(src, dst, verbose) to move/copy image to appropriate path
     return
 
 def cp(kwargs):
     """Copy images to sorted directories."""
-    pout("Not yet implemented!", kwargs["verbose"], Level.CRITICAL)
-    pout(kwargs, kwargs["verbose"], Level.INFO)
+    pout(kwargs, kwargs["verbose"], Level.DEBUG)
     sort(kwargs, copyImage)
     pass
 
 def mv(kwargs):
     """Move images to sorted directories."""
-    pout("Not yet implemented!", kwargs["verbose"], Level.WARNING)
-    pout(kwargs, kwargs["verbose"], Level.INFO)
+    pout(kwargs, kwargs["verbose"], Level.DEBUG)
     sort(kwargs, moveImage)
     pass
