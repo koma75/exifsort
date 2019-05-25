@@ -16,11 +16,24 @@ Usage
 
 ### Move command
 
-~~~shell
-> exifsort mv [OPTIONS] SOURCEDIR TARGETDIR
+~~~text
+Usage: exifsort mv [OPTIONS] SRCDIR TGTDIR
+
+  Sort and Move images from SRCDIR to TGTDIR.
+
+Options:
+  -r, --recurse    Search for images in SRCDIR recursively
+  -o, --overwrite  Overwrite files in TGTDIR
+  -H, --hierarch   Create a hierarchical directory for Year, Month and Date in
+                   TGTDIR
+  -d, --dry-run    Dry run the command without moving
+  -f, --fmt <fmt>  Format target directory name using date format string give
+                   in <fmt>.  Use Python strftime directives.
+  -V, --verbose    output in verbose mode
+  -h, --help       Show this message and exit.
 ~~~
 
-Moves the images inside SOURCEDIR into sorted folders under TARGETDIR.
+Moves the images inside SRCDIR into sorted folders under TGTDIR.
 Target folders will be sorted based on the date the image was created
 (Referes to Exif meta-data or the file creation date if exif is not
 available).
@@ -34,13 +47,13 @@ available).
 * -H, --hierarch
     * create a folder for year, month and date in a hierarchical manner
       instead of one folder for each date.
-* -g, --geotag (Not Implemented)
-    * create a folder for each country and state/province using Google
-      Geotag API.
+* -d, --dry-run
+    * dry run the command.  nothing will be moved
 * -f, --fmt DATEFORMAT
     * format the folder name using date format string specified by DATEFORMAT
     * ignored when "-h" is specified.
 * -v, --verbose
+    * verbose mode
 
 ### Copy command
 
