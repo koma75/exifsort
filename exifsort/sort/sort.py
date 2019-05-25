@@ -51,9 +51,12 @@ class Level(IntEnum):
 
 def pout(msg=None, Verbose=False, level=Level.INFO, newline=True):
     """stdout support method
-    :param msg: message to print
-    :param Verbose: Set True to print DEBUG message
-    :param level: Set message level for coloring
+
+    Keyword Arguments:
+        msg {string} -- message to print (default: {None})
+        Verbose {bool} -- Set True to print DEBUG message (default: {False})
+        level {Level} -- Set message level for coloring (default: {Level.INFO})
+        newline {bool} -- set to False if trailing new line is not needed (default: {True})
     """
     error=False
     if level in {Level.NOTSET, Level.DEBUG}:
@@ -74,11 +77,16 @@ def pout(msg=None, Verbose=False, level=Level.INFO, newline=True):
     click.echo(click.style(str(msg), fg=fg), nl=newline, err=error)
 
 def copyImage(src, dst, dryrun=False, overwrite=False, verbose=False):
-    """copy image from src to dst
-    :param src: path to image to copy
-    :param dst: directory path to copy src to
-    :param dryrun: dryrun if set to True
-    :param verbose: set to true to output debug messages
+    """Copy image from src to dst
+
+    Arguments:
+        src {string} -- path to image to copy
+        dst {string} -- path to copy src to
+
+    Keyword Arguments:
+        dryrun {bool} -- Set to True to dry-run command (default: {False})
+        overwrite {bool} -- Set to True to overwrite any files in dst (default: {False})
+        verbose {bool} -- Set to True for verbose messages (default: {False})
     """
     pout("{img} => {toDir}".format(img=os.path.abspath(src), toDir=os.path.abspath(dst)), verbose, Level.INFO)
     if not dryrun:
@@ -102,11 +110,16 @@ def copyImage(src, dst, dryrun=False, overwrite=False, verbose=False):
         pout("DRY RUN... nothing is copied", verbose, Level.INFO)
 
 def moveImage(src, dst, dryrun=False, overwrite=False, verbose=False):
-    """move image from src to dst
-    :param src: path to image to move
-    :param dst: directory path to move src to
-    :param dryrun: dryrun if set to True
-    :param verbose: set to true to output debug messages
+    """Move image from src to dst
+
+    Arguments:
+        src {string} -- path to image to move
+        dst {string} -- path to move src to
+
+    Keyword Arguments:
+        dryrun {bool} -- Set to True to dry-run command (default: {False})
+        overwrite {bool} -- Set to True to overwrite any files in dst (default: {False})
+        verbose {bool} -- Set to True for verbose messages (default: {False})
     """
     pout("{img} => {toDir}".format(img=os.path.abspath(src), toDir=os.path.abspath(dst)), verbose, Level.INFO)
     if not dryrun:
@@ -130,10 +143,15 @@ def moveImage(src, dst, dryrun=False, overwrite=False, verbose=False):
         pout("DRY RUN... nothing is moved", verbose, Level.INFO)
 
 def creation_date(path_to_file):
-    """
-    Try to get the date that a file was created, falling back to when it was
+    """Try to get the date that a file was created, falling back to when it was
     last modified if that isn't possible.
     See http://stackoverflow.com/a/39501288/1709587 for explanation.
+
+    Arguments:
+        path_to_file {string} -- Path to the file
+
+    Returns:
+        datetime.date -- returns date object with the creation date of file.
     """
     if platform.system() == 'Windows':
         return date(*time.localtime(os.path.getctime(path_to_file))[:3])
@@ -147,6 +165,17 @@ def creation_date(path_to_file):
             return date(*time.localtime(stat.st_mtime)[:3])
 
 def getDateOfImage(fpath, verbose=False):
+    """Get the date of image from exif, or file creation time
+
+    Arguments:
+        fpath {string} -- path to image file
+
+    Keyword Arguments:
+        verbose {bool} -- Set True to output verbose messages. (default: {False})
+
+    Returns:
+        datetime.date -- date of image taken, or file created.
+    """
     rt = None
     # First try to get date from exif
     try:
@@ -172,21 +201,34 @@ def getDateOfImage(fpath, verbose=False):
     return rt
 
 def getImages(flist=[], verbose=False):
+    """Get images information from list of paths to images
+
+    Keyword Arguments:
+        flist {list} -- list of paths to image files (default: {[]})
+        verbose {bool} -- set Verbose mode to print extra messages (default: {False})
+    """
     for fpath in flist:
         dateinfo = getDateOfImage(fpath, verbose)
         # if datetimeinfor is "NON", get the date from os
         yield ({"path": fpath, "date" : dateinfo})
 
 def getTgtDir(basePath, fmt, filedate, filename, hierarch=False, verbose=False, makedir=False):
-    """generate the path to move file to based on base path and format.
-    If the path does not exist, the directories will be generated as well.
-    :param basePath: path where directories are made
-    :param fmt: formatting for the directory path
-    :param filedate: datetime.date object.  path will be based on this date
-    :param hierarch: ignore fmt and create a new hierarchical path %Y/%m/%d
-    :param verbose: verbose mode if set to True
-    :param makedir: create the target path if True
-    returns a string
+    """Generate the path to move file to, based on base path and format.
+    If the path does not exist, directories may be generated with makedir flag.
+
+    Arguments:
+        basePath {string} -- path where directories are made
+        fmt {string} -- format string to use to create subdirectories
+        filedate {datetime.date} -- date the image was taken or created
+        filename {string} -- filename of the image
+
+    Keyword Arguments:
+        hierarch {bool} -- Set to true to create a new hierarchical path %Y/%m/%d (default: {False})
+        verbose {bool} -- Set Verbose mode to output extra messages (default: {False})
+        makedir {bool} -- Set true to create directories if it does not exist (default: {False})
+
+    Returns:
+        string -- path to move files to
     """
     rt = None
     if not hierarch:
@@ -199,8 +241,10 @@ def getTgtDir(basePath, fmt, filedate, filename, hierarch=False, verbose=False, 
 
 def sort(kwargs, func):
     """Sort images to sorted directories using func
-    :param kwargs: argument dictionary created by click
-    :func: function to use to transfer the file
+
+    Arguments:
+        kwargs {dict} -- command line argument parsed by click library
+        func {function} -- function to use to process images
     """
     # 'srcdir': source directory to search (string)
     sSrc = kwargs['srcdir']
@@ -259,13 +303,22 @@ def sort(kwargs, func):
     return
 
 def cp(kwargs):
-    """Copy images to sorted directories."""
+    """Copy images to sorted directories
+
+    Arguments:
+        kwargs {dict} -- command line arguments parsed by click library
+    """
+    # Copy images to sorted directories.
     pout(kwargs, kwargs["verbose"], Level.DEBUG)
     sort(kwargs, copyImage)
     pass
 
 def mv(kwargs):
-    """Move images to sorted directories."""
+    """Move images to sorted directories
+
+    Arguments:
+        kwargs {dict} -- command line arguments parsed by click library
+    """
     pout(kwargs, kwargs["verbose"], Level.DEBUG)
     sort(kwargs, moveImage)
     pass

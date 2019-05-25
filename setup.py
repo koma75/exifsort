@@ -51,7 +51,7 @@ setup(
     author_email='omoikane75@gmail.com',
     license='BSD 2-Clause',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: BSD License',
