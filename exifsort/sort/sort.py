@@ -163,12 +163,12 @@ def getDateOfImage(fpath, verbose=False):
             pout("Exif not found: {filename}".format(filename=fpath),
                 verbose,
                 Level.DEBUG)
-            # use file creation date instead if exif is not found
-            rt = creation_date(fpath)
     except:
         pout("{filename} not an image".format(filename=fpath),
             verbose,
             Level.DEBUG)
+    if rt == None:
+        rt = creation_date(fpath) # still needed to support .mov and other files
     return rt
 
 def getImages(flist=[], verbose=False):
@@ -231,7 +231,7 @@ def sort(kwargs, func):
         for fpath in os.listdir(sSrc):
             flist.append(fpath)
     pout(flist, bVerb, Level.DEBUG)
-    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4')
+    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4', '.3gp', '.avi')
     flist = [ file for file in flist if file.lower().endswith(extensions) ]
     # Step 2:
     # Move/Copy files to kwargs["dstdir"]/<formatted date dir>
