@@ -275,7 +275,7 @@ def sort(kwargs, func):
         for fpath in os.listdir(sSrc):
             flist.append(fpath)
     pout(flist, bVerb, Level.DEBUG)
-    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4', '.3gp', '.avi')
+    extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4', '.3gp', '.avi', 'heic')
     flist = [ file for file in flist if file.lower().endswith(extensions) ]
     # Step 2:
     # Move/Copy files to kwargs["dstdir"]/<formatted date dir>
