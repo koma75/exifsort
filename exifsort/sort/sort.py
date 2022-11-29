@@ -273,7 +273,7 @@ def sort(kwargs, func):
                 flist.append(subdir + os.sep + fpath)
     else:
         for fpath in os.listdir(sSrc):
-            flist.append(fpath) # TODO: this code does not expand to full path.
+            flist.append(sSrc + os.sep + fpath)
     pout(flist, bVerb, Level.DEBUG)
     extensions = ( '.jpg', '.jpeg', '.png', '.gif', '.tif', '.tiff', '.bmp', '.webp', '.img', '.mov', '.mp4', '.3gp', '.avi', 'heic')
     flist = [ file for file in flist if file.lower().endswith(extensions) ]
