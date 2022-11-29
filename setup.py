@@ -72,7 +72,7 @@ setup(
         ),
 
     # add your package requirements
-    install_requires=['click>=7,<8', 'pillow>=9.3.0,<10', 'colorama>=0.4,<0.5'],
+    install_requires=['click>=8,<9', 'pillow>=9.3.0,<10'],
 
     entry_points={
         'console_scripts': [
