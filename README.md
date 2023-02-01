@@ -1,6 +1,8 @@
 exifsort
 ========================================================================
 
+**TOOL CONSOLIDATED TO https://github.com/koma75/imgtk**
+
 Command line tool to sort image files in one folder to another by date
 of image (exif meta-data or file creation date).
 
